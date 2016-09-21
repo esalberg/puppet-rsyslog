@@ -24,6 +24,17 @@ class rsyslog::params {
   $preserve_fqdn                       = false
   $im_journal_statefile                = false
 
+  if $::osfamily == 'RedHat' and versioncmp($::operatingsystemmajrelease, '7') >= 0 {
+    $im_journal_ratelimit_interval       = '600'
+    $im_journal_ratelimit_burst          = '20000'
+    $im_journal_ignore_previous_messages = 'off'
+  }
+  else {
+    $im_journal_ratelimit_interval       = undef
+    $im_journal_ratelimit_burst          = undef
+    $im_journal_ignore_previous_messages = undef
+  }
+
   case $::osfamily {
     'Debian': {
       case $::operatingsystem {
@@ -109,9 +120,6 @@ class rsyslog::params {
           '#$ModLoad immark  # provides --MARK-- message capability',
         ]
         $omit_local_logging                  = false
-        $im_journal_ratelimit_interval       = undef
-        $im_journal_ratelimit_burst          = undef
-        $im_journal_ignore_previous_messages = undef
       }
       elsif versioncmp($::operatingsystemmajrelease, '7') >= 0 {
         $rsyslog_package_name                = 'rsyslog'
